@@ -1,0 +1,20 @@
+{
+  "name": "fx-gulp",
+  "version": "0.0.1",
+  "author": "wujohns",
+  "description": "browserify plugin develop test",
+  "private": true,
+  "engine": {
+    "node": ">=4.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.14.0"
+  },
+  "devDependencies": {
+    "gulp": "~3.9.1",
+    "del": "~2.2.2",
+    "browserify": "~13.1.1",
+    "vinyl-source-stream": "~1.1.0",
+    "vinyl-buffer": "~1.0.0"
+  }
+}
