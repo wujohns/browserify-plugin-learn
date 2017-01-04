@@ -18,7 +18,6 @@ function BBify (filename, opts) {
     this.cssExt = /\.css$/;
     this._data = "";
     this._filename = filename;
-
 };
 
 /**
