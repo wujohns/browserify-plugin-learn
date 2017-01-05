@@ -77,10 +77,26 @@ module.exports = (browserify, options) => {
     const cssOutFilename = options.output;
     const jsonOutFilename = options.json;
     
+    // 一系列 plugin 的拼接
     const plugins = options.use || getDefaultPlugins();
     const postcssBefore = options.postcssBefore || [];
     const postcssAfter = options.postcssAfter || [];
     plugins = postcssBefore.concat(plugins).concat(postcssAfter);
 
-    // TOOD line 121 解析其用途并进行剩余部分
+    // 对输出的 css 文件创建 loader，TODO 需要对 FileSystemLoader 做特定的试验（并且需要css-modules-loader-core做实验）
+    if (!loadersByFile[cssOutFilename]) {
+        loadersByFile[cssOutFilename] = new FileSystemLoader(rootDir, plugins);
+    }
+
+    // fuck 153, TODO Cmify还是重写吧，作者太脑残了，代码质量太差
+    Cmify.prototype._flush = function (callback) {
+        const filename = this._filename;
+        if (!this.isCssFile(filenam)) {
+            return callback();
+        }
+
+        const loader = loadersByFile[this._cssOutFilename];
+
+        const relFilename = path.relative(rootDir, filename);
+    }
 };
