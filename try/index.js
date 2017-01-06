@@ -88,7 +88,7 @@ module.exports = (browserify, options) => {
         loadersByFile[cssOutFilename] = new FileSystemLoader(rootDir, plugins);
     }
 
-    // fuck 153, TODO Cmify还是重写吧，作者太脑残了，代码质量太差
+    // fuck 153, TODO Cmify还是重写吧，代码质量太差
     Cmify.prototype._flush = function (callback) {
         const filename = this._filename;
         if (!this.isCssFile(filenam)) {
