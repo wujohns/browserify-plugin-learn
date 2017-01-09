@@ -27,7 +27,7 @@ gulp.task('self', () => {
 });
 
 // css-modulesify 开发协同试验
-const cssModulesify = require('css-modulesify');
+const cssModulesify = require('./try/index');
 gulp.task('index', () => {
     browserify({
         entries: ['./src/index.js'],
