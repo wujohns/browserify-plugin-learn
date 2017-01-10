@@ -7,7 +7,6 @@ const gulp = require('gulp');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
-const lessify = require('node-lessify');
 
 const selfPlugins = require('./plugins');
 
@@ -27,7 +26,7 @@ gulp.task('self', () => {
 });
 
 // css-modulesify 开发协同试验
-const cssModulesify = require('./try/index');
+const cssModulesify = require('css-modulesify');
 gulp.task('index', () => {
     browserify({
         entries: ['./src/index.js'],
@@ -35,8 +34,9 @@ gulp.task('index', () => {
     })
     .plugin(cssModulesify, {
         rootDir: __dirname,
-        output: './dist/main.css',
-        json: './dist/main.json',
+        // output: './dist/main.css',
+        inline: true,
+        // json: './dist/main.json',
         generateScopedName: cssModulesify.generateShortName
     })
     .bundle()
@@ -45,3 +45,14 @@ gulp.task('index', () => {
     .pipe(gulp.dest('./dist'));
 });
 
+const lessify = require('./plugins/lessify');
+gulp.task('less', () => {
+    browserify({
+        entries: ['./src/index.js'],
+        debug: true
+    }).transform(lessify, {})
+    .bundle()
+    .pipe(source('./bundle.js'))
+    .pipe(buffer())
+    .pipe(gulp.dest('./dist'));
+});
