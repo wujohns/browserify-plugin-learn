@@ -56,3 +56,15 @@ gulp.task('less', () => {
     .pipe(buffer())
     .pipe(gulp.dest('./dist'));
 });
+
+const lessModulesify = require('./less-modulesify');
+gulp.task('lessm', () => {
+    browserify({
+        entries: ['./src/index.js'],
+        debug: true
+    }).plugin(lessModulesify, {})
+    .bundle()
+    .pipe(source('./bundle.js'))
+    .pipe(buffer())
+    .pipe(gulp.dest('./dist'));
+});
