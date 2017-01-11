@@ -5,9 +5,13 @@
 
 const through = require('through2');
 const less = require('less');
+const LessPluginScope = require('./less-scope');
+const lessScope = new LessPluginScope();
 const compileOptions = {
     // less编译的配置
-}
+    compress: false,
+    // plugins: [lessScope]
+};
 
 /**
  * 自定义的 browserify 的 less 处理插件
@@ -22,21 +26,24 @@ module.exports = (filename, options) => {
      * 
      * 补充：在配合 browserify 的 external 属性使用时需要做额外测试
      */
+    let lessString = "";
     return through.obj(
         // _transform，对单次传输过来的数据的处理
         function (chunk, enc, callback) {
-            console.log('---------------');
-            console.log(filename);
             if (!/\.css$|\.less$/.test(filename)) {
+                // 忽略非 css/less 文件
                 this.push(chunk);
-                console.log(chunk.toString());
                 return callback();
             }
+            lessString += chunk.toString();
             return callback();
         },
         // _flush，在上述的 _transform 工作都结束后的处理
         function (callback) {
-            return callback();
+            less.render(lessString, compileOptions, (err, output) => {
+                console.log(output.css);
+                return callback();
+            });
         }
     );
 };
