@@ -5,7 +5,7 @@
 'use strict';
 
 const _ = require('lodash');
-const lessify = require('./lessify');
+const Lmify = require('./lmify');
 
 module.exports = (browserify, options) => {
     /**
@@ -17,7 +17,9 @@ module.exports = (browserify, options) => {
      */
     const transformOpts = _.pick(options, []);
     const pipelineOpts = _.pick(options, []);
-    browserify.transform(lessify, transformOpts);
+    browserify.transform((filename, options) => {
+        return new Lmify(filename, options);
+    }, transformOpts);
 
     // TODO browserify 的 pipeline 处理部分
     return browserify;

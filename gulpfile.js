@@ -57,14 +57,24 @@ gulp.task('less', () => {
     .pipe(gulp.dest('./dist'));
 });
 
+// TODO 对 sourcemap 支持进行验证
 const lessModulesify = require('./less-modulesify');
+const sourcemaps = require('gulp-sourcemaps');
 gulp.task('lessm', () => {
     browserify({
         entries: ['./src/index.js'],
         debug: true
-    }).plugin(lessModulesify, {})
+    }).plugin(lessModulesify, {}).plugin(cssModulesify, {
+        rootDir: __dirname,
+        // output: './dist/main.css',
+        inline: true,
+        // json: './dist/main.json',
+        generateScopedName: cssModulesify.generateShortName
+    })
     .bundle()
-    .pipe(source('./bundle.js'))
+    .pipe(source('./dist/bundle.js'))
     .pipe(buffer())
-    .pipe(gulp.dest('./dist'));
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./'));
 });

@@ -36,6 +36,7 @@ let packageConfig = {
     devDependencies: {
         // gulp基础包依赖
         'gulp': '~3.9.1',
+        'gulp-sourcemaps': '^2.2.0',
         'del': '~2.2.2',                // 删除文件
 
         // browserify包的依赖
