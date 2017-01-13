@@ -27,7 +27,9 @@ let packageConfig = {
         'resolve': '^1.1.7',
         'string-hash': '^1.1.0',
         'through2': '^2.0.1',
-        'less': '^2.2.0'
+        'less': '^2.2.0',
+        'postcss': '^5.2.10',
+        'postcss-modules': '^0.6.2'
     },
 
     /**

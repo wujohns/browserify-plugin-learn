@@ -5,7 +5,11 @@
 
 const through = require('through2');
 const less = require('less');
-const Transform = require('stream').Transform
+const path = require('path');
+const Transform = require('stream').Transform;
+
+// 完成对 sourcemap 的支持
+const currentWorkingDir = process.cwd();
 const compileOptions = {
     // less编译的配置
     compress: false,
@@ -25,16 +29,16 @@ class Lmify extends Transform {
             this.push(chunk);
             return callback();
         }
-        this._lessString = chunk.toString();
-        return callback();
+        less.render(chunk.toString(), compileOptions, (err, output) => {
+            const sourceMapTag = `/*# sourceURL=${ path.relative(currentWorkingDir, this._filename).replace(/\\/g, '/') }*/`;
+            console.log(sourceMapTag);
+            // this.push(output.css + sourceMapTag);
+            this.push(output.css);
+            return callback();
+        });
     }
 
     _flush (callback) {
-        less.render(this._lessString, compileOptions, (err, output) => {
-            this.push(output.css);
-            console.log(output.css);
-            return callback();
-        });
         return callback();
     }
 }

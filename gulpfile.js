@@ -66,8 +66,8 @@ gulp.task('lessm', () => {
         debug: true
     }).plugin(lessModulesify, {}).plugin(cssModulesify, {
         rootDir: __dirname,
-        // output: './dist/main.css',
-        inline: true,
+        output: './dist/main.css',
+        // inline: true,
         // json: './dist/main.json',
         generateScopedName: cssModulesify.generateShortName
     })

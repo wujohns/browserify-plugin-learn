@@ -4,6 +4,9 @@
  */
 'use strict';
 
+const postcss = require('postcss');
+const postcssModules = require('postcss-modules');
+
 class LessPluginScope {
 	/**
 	 * 初始化
