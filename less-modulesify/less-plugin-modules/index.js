@@ -6,6 +6,7 @@
 
 const postcss = require('postcss');
 const postcssModules = require('postcss-modules');
+const getModulesProcessor = require('./modules-processor');
 
 class LessPluginScope {
 	/**
@@ -16,9 +17,11 @@ class LessPluginScope {
 	}
 
 	install (less, pluginManager) {
-		console.log(less);
+		const ModulesProcessor = getModulesProcessor(less);
+		pluginManager.addPostProcessor(new ModulesProcessor(this.options));
 	}
 
+	// TODO 放在最后一步完成 ---------------------------------------------------
 	printUsage () {
 		// not in using
 		console.log("try build a less plugin");
@@ -28,6 +31,7 @@ class LessPluginScope {
 		// not in using
 		this.options = options;
 	}
+	// -------------------------------------------------------------------------
 }
 
 LessPluginScope.prototype.minVersion = [2, 0, 0];
