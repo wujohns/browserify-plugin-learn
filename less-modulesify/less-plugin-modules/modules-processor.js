@@ -11,7 +11,8 @@ class ModulesProcessor {
     process (css, extra) {
         // 主要为让 less 的 sourcemap 与 postcss 的 sourcemap 打通，将 postcss 插件转换为 less 插件的定式
         const sourceMap = extra.sourceMap;
-        const sourceMapInline, processOptions = {};
+        const processOptions = {};
+        let sourceMapInline;
 
         if (sourceMap) {
             processOptions.map = {};
@@ -27,12 +28,20 @@ class ModulesProcessor {
             }
         }
 
-        const processed = postcss([postcssModules(this.options)]).process(css, processOptions);
+        postcss([
+            postcssModules({
+                getJSON: (cssFileName, json) => {
+                    console.log(cssFileName);
+                    console.log(json);
+                }
+            })
+        ]).process(css, processOptions);
+
         if (sourceMap && !sourceMapInline) {
             sourceMap.setExternalSourceMap(processed.map);
         }
 
-        return processed.css;
+        console.log(process.css);
     }
 }
 

@@ -6,7 +6,8 @@
 
 const postcss = require('postcss');
 const postcssModules = require('postcss-modules');
-const getModulesProcessor = require('./modules-processor');
+// const getModulesProcessor = require('./modules-processor');
+const getModulesProcessor = require('./autoprefix-processor');
 
 class LessPluginScope {
 	/**

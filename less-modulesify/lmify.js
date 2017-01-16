@@ -9,11 +9,16 @@ const path = require('path');
 const Transform = require('stream').Transform;
 
 // 完成对 sourcemap 的支持
+const LessPluginModules = require('./less-plugin-modules');
+const modulesPlugin = new LessPluginModules();
 const currentWorkingDir = process.cwd();
 const compileOptions = {
     // less编译的配置
     compress: false,
-    // plugins: [lessScope]
+    plugins: [modulesPlugin],
+    sourceMap: {
+        sourceMapFileInline: true
+    }
 };
 
 class Lmify extends Transform {
@@ -30,10 +35,9 @@ class Lmify extends Transform {
             return callback();
         }
         less.render(chunk.toString(), compileOptions, (err, output) => {
-            const sourceMapTag = `/*# sourceURL=${ path.relative(currentWorkingDir, this._filename).replace(/\\/g, '/') }*/`;
-            console.log(sourceMapTag);
             // this.push(output.css + sourceMapTag);
-            this.push(output.css);
+            // this.push(output.css);
+            console.log(output);
             return callback();
         });
     }
