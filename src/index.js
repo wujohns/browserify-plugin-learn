@@ -4,6 +4,6 @@ var lib = require('./lib');
 
 console.log(style.BBArea);
 var content = document.getElementById('content');
-content.className = style.BBArea;
+content.className = 'BBArea';
 
 lib.bbfn();

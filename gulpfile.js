@@ -50,7 +50,14 @@ gulp.task('less', () => {
     browserify({
         entries: ['./src/index.js'],
         debug: true
-    }).transform(lessify, {})
+    }).transform(lessify, {
+        compileOptions: {
+            sourceMap: {
+                sourceMapBasepath: 'dist/',
+                sourceMapFileInline: true
+            }
+        }
+    })
     .bundle()
     .pipe(source('./bundle.js'))
     .pipe(buffer())
