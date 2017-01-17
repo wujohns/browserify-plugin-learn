@@ -64,13 +64,21 @@ gulp.task('lessm', () => {
     browserify({
         entries: ['./src/index.js'],
         debug: true
-    }).plugin(lessModulesify, {}).plugin(cssModulesify, {
-        rootDir: __dirname,
-        output: './dist/main.css',
-        // inline: true,
-        // json: './dist/main.json',
-        generateScopedName: cssModulesify.generateShortName
     })
+    .plugin(lessModulesify, {
+        lessCompileOption: {
+            sourceMap: {
+                sourceMapFileInline: true
+            }
+        }
+    })
+    // .plugin(cssModulesify, {
+    //     rootDir: __dirname,
+    //     output: './dist/main.css',
+    //     // inline: true,
+    //     // json: './dist/main.json',
+    //     generateScopedName: cssModulesify.generateShortName
+    // })
     .bundle()
     .pipe(source('./dist/bundle.js'))
     .pipe(buffer())

@@ -1,26 +1,19 @@
 /**
- * TODO need write a less-scope
+ * 思路：在设定好的less编译完成后，添加适应 css-module 规范的编译
  */
-
 'use strict';
 
 const _ = require('lodash');
 const Lmify = require('./lmify');
 
 module.exports = (browserify, options) => {
-    /**
-     * TODO 将传入的 options 划分为 transform 与 pipeline 两部分：
-     * 1、transform 部分配置用于 browserify.transform 的 option 属性
-     * 2、pipeline 部分用于 hack browserify 的 pipeline 结构时使用
-     *
-     * 备注：尽量保证参数 key 一致避免分歧
-     */
-    const transformOpts = _.pick(options, []);
-    const pipelineOpts = _.pick(options, []);
+    const lessCompileOption = _.get(options, 'lessCompileOption', {});  // less 的编译配置（按照less本身的配置去做）
     browserify.transform((filename, options) => {
         return new Lmify(filename, options);
-    }, transformOpts);
+    }, {
+        lessCompileOption: lessCompileOption
+    });
 
-    // TODO browserify 的 pipeline 处理部分
+    // TODO 如果有必要可以在这里添加 browserify 的 pipeline 部分
     return browserify;
 };
