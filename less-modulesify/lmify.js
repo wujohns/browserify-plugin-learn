@@ -18,7 +18,9 @@ class Lmify extends Transform {
     constructor (filename, options) {
         super();
         this._filename = filename;
-        this._lessCompileOption = _.get(options, 'lessCompileOption', {});
+        this._lessCompileOption = _.defaults({}, options.lessCompileOption, {
+            filename: this._filename
+        });
     }
 
     /**
@@ -36,73 +38,39 @@ class Lmify extends Transform {
         async.auto({
             // 按照配置编译 less
             compileLess: (callback) => {
-                // sourceMapInputFilename
                 less.render(chunk.toString(), this._lessCompileOption, callback);
             },
             // 使用 postcss 实现对 css module 的支持
             cssModule: ['compileLess', (results, callback) => {
-                // TODO 需要在lessify做细微调整
-                const sourceURL = path.relative(process.cwd(), this._filename).replace(/\\/g, '/');
-                // const targetCss = JSON.stringify(`${ results.compileLess.css }/*# sourceURL=${ sourceURL } */`);
-                const targetCss = JSON.stringify(`${ results.compileLess.css }`);
-                const newChunk = `
-                    module.exports = ${ JSON.stringify({}) };
-                    (function() { 
-                        var head = document.getElementsByTagName('head')[0];
-                        var style = document.createElement('style');
-                        style.type = 'text/css';
-                        var css = ${ targetCss };
-                        if (style.styleSheet) {
-                            style.styleSheet.cssText = css;
-                        } else {
-                            style.appendChild(document.createTextNode(css));
+                const lessOutput = results.compileLess;
+                const postcssCompileOption = this._getPostcssCompileOption();
+                let postcssJson;
+                postcss([
+                    postcssModules({
+                        getJSON: (cssFileName, json) => {
+                            postcssJson = json;
                         }
-                        head.appendChild(style);
-                    }())
-                `;
-                this.push(newChunk);
-                return callback();
-
-                // const lessOutput = results.compileLess;
-                // const postcssCompileOption = this._getPostcssCompileOption();
-                // let postcssJson;
-                // postcss([
-                //     postcssModules({
-                //         getJSON: (cssFileName, json) => {
-                //             postcssJson = json;
-                //         }
-                //     })
-                // ])
-                // .process(lessOutput.css, postcssCompileOption)
-                // .then((processResult) => {
-                //     // TODO /*# sourceURL 的添加，可以参考 lessify.js
-                //     const sourceURL = path.relative(process.cwd(), this._filename).replace(/\\/g, '/');
-                //     const targetCss = JSON.stringify(`${ processResult.css }/*# sourceURL=${ sourceURL } */`);
-                //     console.log(targetCss);
-                //     const newChunk = `
-                //         module.exports = ${ JSON.stringify(postcssJson) };
-                //         (function() { 
-                //             var head = document.getElementsByTagName('head')[0];
-                //             var style = document.createElement('style');
-                //             style.type = 'text/css';
-                //             var css = ${ targetCss };
-                //             if (style.styleSheet) {
-                //                 style.styleSheet.cssText = css;
-                //             } else {
-                //                 style.appendChild(document.createTextNode(css));
-                //             }
-                //             head.appendChild(style);
-                //         }())
-                //     `;
-                //     this.push(newChunk);
-                //     console.log('---------------------------');
-                //     console.log(path.relative(process.cwd(), this._filename));
-                //     console.log('---------------------------');
-                //     return callback();
-                // });
+                    })
+                ])
+                .process(lessOutput.css, postcssCompileOption)
+                .then((processResult) => {
+                    const targetCss = JSON.stringify(`${ processResult.css }`);
+                    const newChunk = `
+                        module.exports = ${ JSON.stringify(postcssJson) };
+                        (function() {
+                            var head = document.getElementsByTagName('head')[0];
+                            var link = document.createElement('link');
+                            link.rel = 'stylesheet';
+                            link.type = 'text/css';
+                            link.href = 'data:text/css;base64,${ new Buffer(processResult.css).toString('base64') }'
+                            head.appendChild(link);
+                        }())
+                    `;
+                    this.push(newChunk);
+                    return callback();
+                });
             }]
         }, (err, results) => {
-            // TODO 支持inline是很容易的，但支持文件单独导出时比较难的（可以参考css-modulesify的方法）
             return callback();
         });
     }
