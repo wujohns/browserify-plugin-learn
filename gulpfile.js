@@ -75,6 +75,8 @@ gulp.task('lessm', () => {
     .plugin(lessModulesify, {
         lessCompileOption: {
             sourceMap: {
+                sourceMapRootPath: 'src/',
+                outputSourceFiles: true,
                 sourceMapFileInline: true
             }
         }

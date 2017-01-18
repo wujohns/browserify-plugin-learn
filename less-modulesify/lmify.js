@@ -36,13 +36,15 @@ class Lmify extends Transform {
         async.auto({
             // 按照配置编译 less
             compileLess: (callback) => {
+                // sourceMapInputFilename
                 less.render(chunk.toString(), this._lessCompileOption, callback);
             },
             // 使用 postcss 实现对 css module 的支持
             cssModule: ['compileLess', (results, callback) => {
                 // TODO 需要在lessify做细微调整
                 const sourceURL = path.relative(process.cwd(), this._filename).replace(/\\/g, '/');
-                const targetCss = JSON.stringify(`${ results.compileLess.css }/*# sourceURL=${ sourceURL } */`);
+                // const targetCss = JSON.stringify(`${ results.compileLess.css }/*# sourceURL=${ sourceURL } */`);
+                const targetCss = JSON.stringify(`${ results.compileLess.css }`);
                 const newChunk = `
                     module.exports = ${ JSON.stringify({}) };
                     (function() { 
