@@ -31,7 +31,8 @@ let packageConfig = {
         'postcss': '^5.2.10',
         'postcss-modules': '^0.6.2',
         'autoprefixer': '^6.6.1',
-        'async': '^2.1.4'
+        'async': '^2.1.4',
+        'write': '^0.3.2'
     },
 
     /**

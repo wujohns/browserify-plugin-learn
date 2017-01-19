@@ -7,6 +7,7 @@ const less = require('less');
 const postcss = require('postcss');
 const postcssModules = require('postcss-modules');
 const Transform = require('stream').Transform;
+const writeFile = require('./writefile');
 
 class Lmify extends Transform {
     /**
@@ -18,9 +19,16 @@ class Lmify extends Transform {
     constructor (filename, options) {
         super();
         this._filename = filename;
+        this._outputDir = options.outputDir;
         this._lessCompileOption = _.defaults({}, options.lessCompileOption, {
-            filename: this._filename
+            filename: this._filename,
+            sourceMap: false
         });
+        if (options.sourceMap) {
+            this._lessCompileOption.sourceMap = {
+                sourceMapFileInline: true
+            };
+        }
     }
 
     /**
@@ -36,14 +44,15 @@ class Lmify extends Transform {
         }
 
         async.auto({
-            // 按照配置编译 less
+            // compile less
             compileLess: (callback) => {
                 less.render(chunk.toString(), this._lessCompileOption, callback);
             },
-            // 使用 postcss 实现对 css module 的支持
+            // using postcss to support the css-module feature
             cssModule: ['compileLess', (results, callback) => {
                 const lessOutput = results.compileLess;
                 const postcssCompileOption = this._getPostcssCompileOption();
+                
                 let postcssJson;
                 postcss([
                     postcssModules({
@@ -54,23 +63,37 @@ class Lmify extends Transform {
                 ])
                 .process(lessOutput.css, postcssCompileOption)
                 .then((processResult) => {
-                    const targetCss = JSON.stringify(`${ processResult.css }`);
-                    const newChunk = `
-                        module.exports = ${ JSON.stringify(postcssJson) };
+                    return callback(null, {
+                        css: processResult.css,
+                        json: postcssJson
+                    });
+                });
+            }],
+            // get ths chunk and write the output file(if outputDir is set)
+            getChunk: ['cssModule', (results, callback) => {
+                const css = results.cssModule.css;
+                const json = results.cssModule.json;
+                const outputFilePath = this._getOutputfilePath();
+                let newChunk = `module.exports = ${ JSON.stringify(json) };`;
+                if (!outputFilePath) {
+                    newChunk += `
                         (function() {
                             var head = document.getElementsByTagName('head')[0];
                             var link = document.createElement('link');
                             link.rel = 'stylesheet';
                             link.type = 'text/css';
-                            link.href = 'data:text/css;base64,${ new Buffer(processResult.css).toString('base64') }'
+                            link.href = 'data:text/css;base64,${ new Buffer(css).toString('base64') }'
                             head.appendChild(link);
                         }())
                     `;
-                    this.push(newChunk);
-                    return callback();
+                    return callback(null, newChunk);
+                }
+                writeFile(outputFilePath, css, (err) => {
+                    return callback(err, newChunk);
                 });
             }]
         }, (err, results) => {
+            this.push(results.getChunk);
             return callback();
         });
     }
@@ -88,12 +111,22 @@ class Lmify extends Transform {
      * @return {Object} the options for postcss's compiling 
      */
     _getPostcssCompileOption () {
-        // TODO 主要是 less 的 soucemap 配置向 postcss 的 soucemap 配置的转换
-        return {
-            map: {
-                inline: true
-            }
-        };
+        const enableSouceMap = _.get(this._lessCompileOption, 'sourceMap.sourceMapFileInline');
+        const postcssOptions = {};
+
+        if (enableSouceMap) {
+            _.set(postcssOptions, 'map.inline', true);
+        }
+        return postcssOptions;
+    }
+
+    /**
+     * get the output css file's fullpath
+     * @return {String} the path
+     */
+    _getOutputfilePath () {
+        // TODO finish it
+        return false;
     }
 }
 

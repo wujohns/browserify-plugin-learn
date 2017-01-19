@@ -22,8 +22,7 @@ module.exports = {
     }
 }
 },{}],3:[function(require,module,exports){
-
-                        module.exports = {"xxx":"_xxx_aravo_1","BBArea":"_BBArea_aravo_4","aaa":"_aaa_aravo_9"};
+module.exports = {"xxx":"_xxx_aravo_1","BBArea":"_BBArea_aravo_4","aaa":"_aaa_aravo_9"};
                         (function() {
                             var head = document.getElementsByTagName('head')[0];
                             var link = document.createElement('link');
@@ -34,8 +33,7 @@ module.exports = {
                         }())
                     
 },{}],4:[function(require,module,exports){
-
-                        module.exports = {"BBAreaa":"_BBAreaa_1r57m_1"};
+module.exports = {"BBAreaa":"_BBAreaa_1r57m_1"};
                         (function() {
                             var head = document.getElementsByTagName('head')[0];
                             var link = document.createElement('link');

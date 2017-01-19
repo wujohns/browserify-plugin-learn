@@ -1,19 +1,28 @@
 /**
- * 思路：在设定好的less编译完成后，添加适应 css-module 规范的编译
+ * After less was compiled，using postcss to support the css-modules feature
  */
 'use strict';
 
 const _ = require('lodash');
 const Lmify = require('./lmify');
 
+/**
+ * used as browserify plugin
+ * @param {Object} browserify - browserify Object
+ * @param {Object} options - the plugin options
+ * @param {Boolean} options.sourceMap - using sourcemap feature, default false
+ * @param {String} options.outputDir - output css file's folder, default using inline-style
+ * @param {Object} options.lessCompileOption - less compile options which is same as original less excepts soucemap
+ */
 module.exports = (browserify, options) => {
-    const lessCompileOption = _.get(options, 'lessCompileOption', {});  // less 的编译配置（按照less本身的配置去做）
     browserify.transform((filename, options) => {
         return new Lmify(filename, options);
     }, {
-        lessCompileOption: lessCompileOption
+        outputDir: _.get(options, 'outputDir', false),
+        sourceMap: _.get(options, 'sourceMap', false),
+        lessCompileOption: _.get(options, 'lessCompileOption', {})
     });
 
-    // TODO 如果有必要可以在这里添加 browserify 的 pipeline 部分
+    // TODO if it's nessesary, using browserify's pipeline feature to add more.
     return browserify;
 };
