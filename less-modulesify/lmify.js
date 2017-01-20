@@ -24,6 +24,7 @@ class Lmify extends Transform {
             filename: this._filename,
             sourceMap: false
         });
+
         if (options.sourceMap) {
             this._lessCompileOption.sourceMap = {
                 sourceMapFileInline: true
@@ -73,7 +74,7 @@ class Lmify extends Transform {
             getChunk: ['cssModule', (results, callback) => {
                 const css = results.cssModule.css;
                 const json = results.cssModule.json;
-                const outputFilePath = this._getOutputfilePath();
+                const outputFilePath = this._getOutputFilePath();
                 let newChunk = `module.exports = ${ JSON.stringify(json) };`;
                 if (!outputFilePath) {
                     newChunk += `
@@ -124,9 +125,15 @@ class Lmify extends Transform {
      * get the output css file's fullpath
      * @return {String} the path
      */
-    _getOutputfilePath () {
-        // TODO finish it
-        return false;
+    _getOutputFilePath () {
+        if (!this._outputDir) {
+            return false;
+        }
+
+        const extname = path.extname(this._filename);
+        const basename = path.basename(this._filename, extname);
+        const outputFilePath = path.join(this._outputDir, `${ basename }.css`);
+        return outputFilePath;
     }
 }
 

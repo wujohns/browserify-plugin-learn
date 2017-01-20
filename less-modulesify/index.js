@@ -12,7 +12,7 @@ const Lmify = require('./lmify');
  * @param {Object} options - the plugin options
  * @param {Boolean} options.sourceMap - using sourcemap feature, default false
  * @param {String} options.outputDir - output css file's folder, default using inline-style
- * @param {Object} options.lessCompileOption - less compile options which is same as original less excepts soucemap
+ * @param {Object} options.lessCompileOption - less compile options which is same as original less excepts sourcemap
  */
 module.exports = (browserify, options) => {
     browserify.transform((filename, options) => {

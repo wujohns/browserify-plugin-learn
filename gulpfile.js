@@ -74,7 +74,7 @@ gulp.task('lessm', () => {
     })
     .plugin(lessModulesify, {
         // 计划新增参数
-        // outputDir: css 文件导出的路径，css 文件和 require 的 less 文件名相同，不设置的话则采用inlineCss方式
+        outputDir: './dist',
         sourceMap: true,
         lessCompileOption: {}
     })

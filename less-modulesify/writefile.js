@@ -11,6 +11,6 @@ const write = require('write');
  * @param {Function} callback - callback function
  */
 module.exports = (outputPath, str, callback) => {
-    // TODO finish it
-    return callback();
+    // if there is problem, try other way to achieve it.
+    write(outputPath, str, callback);
 };
