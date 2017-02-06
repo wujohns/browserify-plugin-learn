@@ -65,7 +65,7 @@ gulp.task('less', () => {
 });
 
 // TODO 对 sourcemap 支持进行验证
-const lessModulesify = require('./less-modulesify');
+const lessModulesify = require('less-modulesify');
 const sourcemaps = require('gulp-sourcemaps');
 gulp.task('lessm', () => {
     browserify({
@@ -74,8 +74,8 @@ gulp.task('lessm', () => {
     })
     .plugin(lessModulesify, {
         // 计划新增参数
-        outputDir: './dist',
-        sourceMap: true,
+        // outputDir: './dist',
+        // sourceMap: true,
         lessCompileOption: {}
     })
     // .plugin(cssModulesify, {
